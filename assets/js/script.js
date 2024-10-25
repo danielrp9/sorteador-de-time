@@ -1,5 +1,5 @@
 function sortTeams() {
-    // Pegar os nomes dos jogadores separados por linhas, remover espaços extras e linhas vazias
+    // Obter os nomes dos jogadores em linhas separadas, removendo espaços extras e linhas vazias
     const names = document.getElementById("names").value
         .split('\n')
         .map(name => name.trim())
@@ -23,33 +23,42 @@ function sortTeams() {
         [names[i], names[j]] = [names[j], names[i]];
     }
 
-    // Inicializar os times como listas vazias
+    // Inicializar os times e distribuir os jogadores
     let teams = Array.from({ length: numTeams }, () => []);
-
-    // Distribuir os jogadores nos times, excluindo goleiros se houver
     let playerIndex = 0;
     for (let i = 0; i < playersPerTeam; i++) {
         for (let j = 0; j < numTeams; j++) {
-            if (names.length > 0) {
+            if (playerIndex < names.length) {
                 teams[j].push(names[playerIndex++]);
             }
         }
     }
 
-    // Adicionar goleiros, se selecionado
+    // Adicionar goleiros, se necessário
     if (hasGoalkeeper) {
         for (let i = 0; i < numTeams; i++) {
-            if (names.length > playerIndex) {
+            if (playerIndex < names.length) {
                 teams[i].unshift(names[playerIndex++]);
             }
         }
     }
 
-    // Exibir os times com uma apresentação estilizada
+    // Separar jogadores restantes que não completam um time
+    const remainingPlayers = names.slice(playerIndex);
+
+    // Exibir os times
     teams.forEach((team, index) => {
         let teamDiv = document.createElement('div');
         teamDiv.classList.add('team', 'mb-3', 'p-3', 'rounded', 'bg-light');
         teamDiv.innerHTML = `<h3>Time ${index + 1}</h3><p>${team.join(', ')}</p>`;
         resultDiv.appendChild(teamDiv);
     });
+
+    // Exibir os jogadores sem time completo, se houver
+    if (remainingPlayers.length > 0) {
+        let remainingDiv = document.createElement('div');
+        remainingDiv.classList.add('remaining-players', 'mb-3', 'p-3', 'rounded', 'bg-warning');
+        remainingDiv.innerHTML = `<h3>Sem time completo</h3><p>${remainingPlayers.join(', ')}</p>`;
+        resultDiv.appendChild(remainingDiv);
+    }
 }
